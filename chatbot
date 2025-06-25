@@ -1,0 +1,166 @@
+import tkinter as tk
+from tkinter import scrolledtext
+import random
+import re
+
+class ChatbotGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Python Chatbot")
+        self.root.geometry("500x600")
+        
+        
+        # Create chat display area
+        self.chat_display = scrolledtext.ScrolledText(root, width=58, height=30, font=("Arial", 10))
+        self.chat_display.place(x=10, y=10)
+        self.chat_display.config(state=tk.DISABLED)
+        
+        # Create input field
+        self.user_input = tk.Entry(root, width=50, font=("Arial", 10))
+        self.user_input.place(x=10, y=520)
+        self.user_input.bind("<Return>", self.send_message)
+        
+        # Create send button
+        self.send_button = tk.Button(root, text="Send", width=10, command=self.send_message)
+        self.send_button.place(x=400, y=520)
+        
+        # Welcome message
+        self.update_chat("Bot: Hello! I'm your chatbot assistant. How can I help you today?")
+
+        file=open("het.txt","r")
+        a=file.read()
+
+        
+        
+        # Define chatbot responses
+        self.intents = {
+            "greeting": {
+                "patterns": [
+                    r"hello", r"hi", r"hey", r"howdy", r"greetings", r"good morning",
+                    r"good afternoon", r"good evening"
+                ],
+                "responses": [
+                    "Hello! How can I help you today?",
+                    "Hi there! What can I do for you?",
+                    "Greetings! How may I assist you?",
+                    "Hey! What's up?"
+                ]
+            },
+            "from file":{
+                "patterns":[
+                    r"read the file"
+                 ],
+                "responses":[
+                    a
+                 ]
+
+             },   
+            "goodbye": {
+                "patterns": [
+                    r"bye", r"goodbye", r"see you", r"see you later", r"farewell"
+                ],
+                "responses": [
+                    "Goodbye! Have a great day!",
+                    "See you later!",
+                    "Take care! Come back anytime.",
+                    "Bye! It was nice talking to you."
+                ]
+            },
+            "thanks": {
+                "patterns": [
+                    r"thank", r"thanks", r"appreciate", r"helpful"
+                ],
+                "responses": [
+                    "You're welcome!",
+                    "Happy to help!",
+                    "Anytime!",
+                    "My pleasure!"
+                ]
+            },
+            "about": {
+                "patterns": [
+                    r"who are you", r"what are you", r"tell me about yourself",
+                    r"your name", r"what is your name"
+                ],
+                "responses": [
+                    "I'm a simple chatbot created for a school project.",
+                    "I'm ChatBot, designed to have conversations.",
+                    "Just a friendly AI here to chat with you!",
+                    "I'm your virtual assistant, created using Python."
+                ]
+            },
+            "help": {
+                "patterns": [
+                    r"help", r"assist", r"support", r"what can you do",
+                    r"how do you work"
+                ],
+                "responses": [
+                    "I can answer questions about various topics. Just ask me anything!",
+                    "I'm here to chat and answer your questions. What would you like to know?",
+                    "I can provide information, have conversations, or just chat casually.",
+                    "Ask me questions, and I'll do my best to respond appropriately!"
+                ]
+            },
+            "a joke":{
+                "patterns":[
+                    r"tell me a joke",r"i want ro hear a joke"
+                ],
+                "responses":[
+                    r"hahahhah",r"csk is eliminated from ipl"
+                ]    
+             }
+          }  
+                    
+            
+        
+        
+        
+        self.default_responses = [
+            r"I'm not sure I understand. Could you rephrase that?",
+            r"Interesting! Can you tell me more?",
+            r"I don't have information about that yet.",
+            r"I'm still learning and don't know how to respond to that.",
+            r"HU HAJI NANO CHU MOTO THY JAIS"
+        ]
+    
+    def update_chat(self, message):
+        """Update chat display with new message"""
+        self.chat_display.config(state=tk.NORMAL)
+        self.chat_display.insert(tk.END, message + "\n")
+        
+        
+    
+    def get_bot_response(self, user_message):
+        """Generate bot response based on user input"""
+        user_message = user_message.lower()
+        
+        # Check for intents
+        for intent, data in self.intents.items():
+            for pattern in data["patterns"]:
+                if re.search(pattern, user_message):
+                    return random.choice(data["responses"])
+        
+        # Return default response if no intent matches
+        return random.choice(self.default_responses)
+    
+    def send_message(self, event=None):
+        """Send message and get response"""
+        user_message = self.user_input.get()
+        
+        if user_message.strip() == "":
+            return
+        
+        # Display user message
+        self.update_chat("You: " + user_message)
+        
+        # Get and display bot response
+        bot_response = self.get_bot_response(user_message)
+        self.update_chat("Bot: " + bot_response)
+        
+        # Clear input field
+        self.user_input.delete(0, tk.END)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ChatbotGUI(root)
+    root.mainloop()
